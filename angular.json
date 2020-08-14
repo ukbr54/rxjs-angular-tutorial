@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "rxjs-angular-tutorial"
+    }
+  },
+  "defaultProject": "rxjs-angular-tutorial",
+  "cli": {
+    "analytics": false
+  }
 }

@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'rxjs-angular-tutorial';
+  pageTitle: string = "Acme Product Management";
 }
