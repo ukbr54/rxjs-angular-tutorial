@@ -13,10 +13,15 @@ export class ProductService{
 
     constructor(private http: HttpClient){}
 
-    getProduct(): Observable<IProduct[]>{
-        return this.http.get<IProduct[]>(this.productUrl).pipe(
+    products$ = this.http.get<IProduct[]>(this.productUrl)
+       .pipe(
             tap(data => console.log('All: ' + JSON.stringify(data))),
-            catchError(this.handleError)
+            catchError(this.handleError) 
+       );
+
+    getProduct(id: number): Observable<IProduct | undefined> {
+        return this.products$.pipe(
+            map((products: IProduct[]) => products.find(p => p.productId === id))
         );
     }
 

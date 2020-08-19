@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IProduct } from './products';
 import { ProductService } from './product.service';
-import { Observable } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 
 @Component({
    selector: 'pm-products',
    templateUrl: './product-list.component.html',
-   styleUrls: ['./product-list.component.css']
+   styleUrls: ['./product-list.component.css'],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ProductListComponent implements OnInit{ 
+export class ProductListComponent { 
     
    pageTitle: string = 'Product List';
    imageWidth = 50;
@@ -28,27 +30,16 @@ export class ProductListComponent implements OnInit{
    }**/
 
    //filteredProducts: IProduct[];
-   products$: Observable<IProduct[]>;
+   products$: Observable<IProduct[]> = this.productService.products$
+      .pipe(
+          catchError(err => {
+              this.errorMessage = err;
+              return EMPTY;
+          })
+        );
 
    constructor(private productService: ProductService){}
 
-   ngOnInit(): void {
-    // this.productService.getProduct().subscribe(data => {
-    //     this.products = data;
-    //     this.filteredProducts = this.products;
-    // },err => {
-    //     this.errorMessage = err
-    // });
-
-       this.products$ = this.productService.getProduct();
-   }
-
-   /**performFilter(filterBy: string): IProduct[] {
-       filterBy = filterBy.toLocaleLowerCase();
-       return this.products.filter((product: IProduct) => 
-          product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
-   }**/
-    
    toggleImage(): void{
        this.showImage = !this.showImage;
    }
@@ -56,4 +47,20 @@ export class ProductListComponent implements OnInit{
    onRatingClicked(message: string): void{
        this.pageTitle = 'Product List: ' + message;
    }
+
+   // ngOnInit(): void {
+    // this.productService.getProduct().subscribe(data => {
+    //     this.products = data;
+    //     this.filteredProducts = this.products;
+    // },err => {
+    //     this.errorMessage = err
+    // }); 
+   //}
+
+   /**performFilter(filterBy: string): IProduct[] {
+       filterBy = filterBy.toLocaleLowerCase();
+       return this.products.filter((product: IProduct) => 
+          product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
+   }**/
+   
 }
