@@ -30,7 +30,7 @@ export class ProductListComponent {
    }**/
 
    //filteredProducts: IProduct[];
-   products$: Observable<IProduct[]> = this.productService.products$
+   products$: Observable<IProduct[]> = this.productService.productWithCategory$
       .pipe(
           catchError(err => {
               this.errorMessage = err;
@@ -62,5 +62,5 @@ export class ProductListComponent {
        return this.products.filter((product: IProduct) => 
           product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
    }**/
-   
+
 }
