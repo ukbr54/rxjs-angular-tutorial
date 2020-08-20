@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { IProduct } from "./products";
 import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge } from "rxjs";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { catchError, tap, map, scan } from 'rxjs/operators';
+import { catchError, tap, map, scan, shareReplay } from 'rxjs/operators';
 import { ProductCategoryService } from '../product-categories/product-category.service';
 
 @Injectable({
@@ -31,7 +31,8 @@ export class ProductService{
                category: categories.find(c => product.categoryId === c.id).name,
                searchKey: [product.productName]
            }) as IProduct)
-        )
+        ),
+        shareReplay(1)
     );
     
     private productSelectedSubject = new BehaviorSubject<number>(0);
