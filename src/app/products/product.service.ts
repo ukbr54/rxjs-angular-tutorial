@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { IProduct } from "./products";
-import { Observable, throwError, combineLatest, BehaviorSubject } from "rxjs";
+import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge } from "rxjs";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, scan } from 'rxjs/operators';
 import { ProductCategoryService } from '../product-categories/product-category.service';
 
 @Injectable({
@@ -51,6 +51,36 @@ export class ProductService{
     selectedProductChanged(selectedProductId: number){
         this.productSelectedSubject.next(selectedProductId);
     }  
+
+
+    private productInsertedSubject = new Subject<IProduct>();
+    productInsertedAction$ = this.productInsertedSubject.asObservable();
+
+    productWithAdd$ = merge(
+        this.productWithCategory$,
+        this.productInsertedAction$
+    ).pipe(
+        scan((acc: IProduct[], value: IProduct) => [...acc,value])
+    );
+
+    addProduct(newProduct?: IProduct){
+        newProduct = newProduct || this.fakeProduct();
+        this.productInsertedSubject.next(newProduct);
+    }
+
+    private fakeProduct(){
+        return{
+            productId: 42,
+            productName: "Another one",
+            productCode: "TBX-0042",
+            releaseDate: "June 23, 2019",
+            description: "Our new Product",
+            price: 1.95,
+            starRating: 3.2,
+            imageUrl: "assets/images/leaf_rake.png",
+            categoryId: 1
+        }
+    }
       
 
     getProduct(id: number): Observable<IProduct | undefined> {
