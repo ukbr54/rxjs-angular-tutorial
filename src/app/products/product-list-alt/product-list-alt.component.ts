@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
-import { Subscription, EMPTY } from 'rxjs';
+import { Subscription, EMPTY, Subject } from 'rxjs';
 
 import { ProductService } from '../product.service';
 import { catchError, tap } from 'rxjs/operators';
@@ -13,13 +13,14 @@ import { catchError, tap } from 'rxjs/operators';
 export class ProductListAltComponent implements OnInit, OnDestroy {
 
     pageTitle = 'Products';
-    errorMessage = '';
+    private errorMessageSubject = new Subject<string>();
+    errorMessage$ = this.errorMessageSubject.asObservable();
 
     products$ = this.productService.productWithCategory$
       .pipe(
           tap(data => "Reading data for Alternate product List: " + JSON.stringify(data)),
           catchError(err =>{
-              this.errorMessage = err;
+              this.errorMessageSubject.next(err)
               return EMPTY;
           })
       );
