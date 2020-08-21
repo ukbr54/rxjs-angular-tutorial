@@ -4,6 +4,7 @@ import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge 
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { catchError, tap, map, scan, shareReplay } from 'rxjs/operators';
 import { ProductCategoryService } from '../product-categories/product-category.service';
+import { SupplierService } from '../supplier/supplier.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,9 @@ export class ProductService{
 
     private productUrl = 'api/products/products.json';
 
-    constructor(private http: HttpClient, private productCategoryService: ProductCategoryService){}
+    constructor(private http: HttpClient, 
+               private productCategoryService: ProductCategoryService,
+               private supplierService: SupplierService){}
 
     products$ = this.http.get<IProduct[]>(this.productUrl)
        .pipe(
@@ -45,8 +48,7 @@ export class ProductService{
       .pipe(
           map(([products,selectedProductId]) =>
             products.find(product => product.productId === selectedProductId)
-          ),
-          tap(data => console.log(JSON.stringify(data)))
+          )
       );
  
     selectedProductChanged(selectedProductId: number){
@@ -68,6 +70,15 @@ export class ProductService{
         newProduct = newProduct || this.fakeProduct();
         this.productInsertedSubject.next(newProduct);
     }
+
+    selectedProductSupplier$ = combineLatest([
+        this.selectedProduct$,
+        this.supplierService.supplier$
+    ]).pipe(
+        map(([selectedProduct,suppliers]) =>
+           suppliers.filter(supplier => selectedProduct.supplierIds.includes(supplier.id)) 
+        )
+    );
 
     private fakeProduct(){
         return{

@@ -10,4 +10,5 @@ export interface IProduct {
     searchKey?: string[],
     categoryId?:number;
     category?: string;
+    supplierIds?: number[];
 }
