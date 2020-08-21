@@ -11,7 +11,7 @@ import { Supplier } from './supplier';
 })
 export class SupplierService {
 
-    supplierUrl = 'api/products/supplier.json';
+    supplierUrl = 'api/suppliers';
 
     supplier$ =  this.http.get<Supplier[]>(this.supplierUrl)
        .pipe(

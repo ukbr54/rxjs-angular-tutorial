@@ -1,34 +1,34 @@
-<div class="card" *ngIf="product$ | async as product">
+<div class="card" *ngIf="vm$ | async as vm">
     <div class="card-header">
-        {{pageTitle + ': ' + product.productName}}
+        {{ vm.pageTitle }}
     </div>
 <div class='card-body'>
         <div class='row'>
           <div class='col-md-8'>
             <div class='row'>
               <div class='col-md-4'>Name:</div>
-              <div class='col-md-8'>{{product.productName}}</div>
+              <div class='col-md-8'>{{vm.product.productName}}</div>
             </div>
             <div class='row'>
               <div class='col-md-4'>Code:</div>
-              <div class='col-md-8'>{{product.productCode | lowercase | convertToSpaces: '-'}}</div>
+              <div class='col-md-8'>{{vm.product.productCode | lowercase | convertToSpaces: '-'}}</div>
             </div>
             <div class='row'>
               <div class='col-md-4'>Description:</div>
-              <div class='col-md-8'>{{product.description}}</div>
+              <div class='col-md-8'>{{vm.product.description}}</div>
             </div>
             <div class='row'>
               <div class='col-md-4'>Availability:</div>
-              <div class='col-md-8'>{{product.releaseDate}}</div>
+              <div class='col-md-8'>{{vm.product.releaseDate}}</div>
             </div>
             <div class='row'>
               <div class='col-md-4'>Price:</div>
-              <div class='col-md-8'>{{product.price|currency:'USD':'symbol'}}</div>
+              <div class='col-md-8'>{{vm.product.price|currency:'USD':'symbol'}}</div>
             </div>
             <div class='row'>
               <div class='col-md-4'>5 Star Rating:</div>
               <div class='col-md-8'>
-                <pm-star [rating]='product.starRating'>
+                <pm-star [rating]='vm.product.starRating'>
                 </pm-star>
               </div>
             </div>
@@ -38,15 +38,14 @@
             <img class='center-block img-responsive'
                  [style.width.px]='200'
                  [style.margin.px]='2'
-                 [src]='product.imageUrl'
-                 [title]='product.productName'>
+                 [src]='vm.product.imageUrl'
+                 [title]='vm.product.productName'>
           </div>
         </div>
       </div>
 
       <div class="table-responsive">
-        <table class="table mb-0"
-               *ngIf="productSuppliers$ | async as productSuppliers">
+        <table class="table mb-0">
           <thead>
             <tr>
               <th>Supplier</th>
@@ -55,7 +54,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let supplier of productSuppliers">
+            <tr *ngFor="let supplier of vm.productSuppliers">
               <td>{{ supplier.name }}</td>
               <td>{{ supplier.cost | currency:"USD":"symbol":"1.2-2" }}</td>
               <td>{{ supplier.minQuantity }}</td>

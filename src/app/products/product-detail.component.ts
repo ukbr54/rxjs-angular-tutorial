@@ -2,8 +2,8 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IProduct } from './products';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from './product.service';
-import { catchError, tap } from 'rxjs/operators';
-import { EMPTY, Subject } from 'rxjs';
+import { catchError, tap, map, filter } from 'rxjs/operators';
+import { EMPTY, Subject, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-product-detail',
@@ -13,7 +13,6 @@ import { EMPTY, Subject } from 'rxjs';
 })
 export class ProductDetailComponent {
 
-  pageTitle: string = "Product Detail";
   //product: IProduct;
   errorMessage = '';
   private errorMessageSubject = new Subject<string>();
@@ -44,7 +43,23 @@ export class ProductDetailComponent {
         this.errorMessageSubject.next(err);
         return EMPTY;
       })
-    );  
+    ); 
+    
+    pageTitle$ = this.product$
+      .pipe(
+        map((p: IProduct) => 
+           p ? `Product Detail for: ${p.productName}` : null
+        )
+      );
+
+    vm$ = combineLatest([
+      this.product$,
+      this.productSuppliers$,
+      this.pageTitle$
+    ]).pipe(
+      filter(([product]) => Boolean(product)),
+      map(([product,productSuppliers,pageTitle]) => ({ product, productSuppliers, pageTitle})) //{}-Object literal
+    )  
 
   // getProduct(id: number): void {
   //   this.productService.getProduct(id).subscribe({

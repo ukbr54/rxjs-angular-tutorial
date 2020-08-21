@@ -10,7 +10,7 @@ import { ProductCategory } from './product-category';
 })
 export class ProductCategoryService {
 
-    private productCategoriesUrl = 'api/products/product-category.json';
+    private productCategoriesUrl = 'api/productCategories';;
 
     productCategories$ = this.http.get<ProductCategory[]>(this.productCategoriesUrl)
         .pipe(

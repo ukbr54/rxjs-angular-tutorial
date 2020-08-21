@@ -1,17 +1,19 @@
 import { Injectable } from "@angular/core";
 import { IProduct } from "./products";
-import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge } from "rxjs";
+import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge, from } from "rxjs";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { catchError, tap, map, scan, shareReplay } from 'rxjs/operators';
+import { catchError, tap, map, scan, shareReplay, mergeMap, toArray, filter, switchMap } from 'rxjs/operators';
 import { ProductCategoryService } from '../product-categories/product-category.service';
 import { SupplierService } from '../supplier/supplier.service';
+import { Supplier } from '../supplier/supplier';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProductService{
 
-    private productUrl = 'api/products/products.json';
+    private productUrl = 'api/products';
+    private supplierUrl = this.supplierService.supplierUrl;
 
     constructor(private http: HttpClient, 
                private productCategoryService: ProductCategoryService,
@@ -71,14 +73,28 @@ export class ProductService{
         this.productInsertedSubject.next(newProduct);
     }
 
-    selectedProductSupplier$ = combineLatest([
+    /**selectedProductSupplier$ = combineLatest([
         this.selectedProduct$,
         this.supplierService.supplier$
     ]).pipe(
         map(([selectedProduct,suppliers]) =>
            suppliers.filter(supplier => selectedProduct.supplierIds.includes(supplier.id)) 
         )
-    );
+    );**/
+
+    selectedProductSupplier$ = this.selectedProduct$
+      .pipe(
+          filter(selectedProduct => Boolean(selectedProduct)),
+          switchMap(selectedProduct => 
+            from(selectedProduct.supplierIds)
+              .pipe(
+                  mergeMap(supplierId => this.http.get<Supplier>(`${this.supplierUrl}/${supplierId}`)),
+                  toArray(),
+                  tap(suppliers => console.log('product suppliers', JSON.stringify(suppliers)))
+              )
+          )
+      );
+
 
     private fakeProduct(){
         return{
@@ -113,7 +129,6 @@ export class ProductService{
         // The response body may contain clues as to what went wrong,
         errorMessage = `Server returned code: ${err.status}, error message is: ${err.message}`;
         }
-        console.error(errorMessage);
         return throwError(errorMessage);
     }
 }
